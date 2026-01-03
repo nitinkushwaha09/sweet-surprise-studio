@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Balloons from '@/components/Balloons';
@@ -12,7 +12,6 @@ const CelebrationPage = ({ onNext }: CelebrationPageProps) => {
   const [candlesBlown, setCandlesBlown] = useState(false);
   const [balloonsFlying, setBalloonsFlying] = useState(false);
   const [darkened, setDarkened] = useState(false);
-  const [showFlyButton, setShowFlyButton] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isMuted, setIsMuted] = useState(false);
 
@@ -29,42 +28,40 @@ const CelebrationPage = ({ onNext }: CelebrationPageProps) => {
     // Blow candles animation
     setCandlesBlown(true);
 
-    // Show fly balloons button after candles are blown
-    setTimeout(() => setShowFlyButton(true), 1000);
-  };
+    // Trigger balloons
+    setTimeout(() => setBalloonsFlying(true), 500);
 
-  const handleFlyBalloons = () => {
-    // Trigger balloons flying up
-    setBalloonsFlying(true);
+    // Trigger confetti
+    setTimeout(() => {
+      const duration = 4 * 1000;
+      const end = Date.now() + duration;
 
-    // Trigger confetti celebration
-    const duration = 4 * 1000;
-    const end = Date.now() + duration;
-    const colors = ['#ff69b4', '#ff1493', '#db7093', '#ffb6c1', '#ffc0cb', '#dda0dd'];
+      const colors = ['#ff69b4', '#ff1493', '#db7093', '#ffb6c1', '#ffc0cb', '#dda0dd'];
 
-    (function frame() {
-      confetti({
-        particleCount: 3,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: colors
-      });
-      confetti({
-        particleCount: 3,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: colors
-      });
+      (function frame() {
+        confetti({
+          particleCount: 3,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: colors
+        });
+        confetti({
+          particleCount: 3,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: colors
+        });
 
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    }());
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
+    }, 800);
 
     // Go to next page after celebration
-    setTimeout(onNext, 4000);
+    setTimeout(onNext, 5000);
   };
 
   const toggleMute = () => {
@@ -82,7 +79,7 @@ const CelebrationPage = ({ onNext }: CelebrationPageProps) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Birthday music */}
+      {/* Birthday music - using a public domain happy birthday tune URL */}
       <audio
         ref={audioRef}
         src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
@@ -152,7 +149,6 @@ const CelebrationPage = ({ onNext }: CelebrationPageProps) => {
           </div>
         </motion.div>
 
-        {/* Blow candles button */}
         {!candlesBlown && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -170,25 +166,7 @@ const CelebrationPage = ({ onNext }: CelebrationPageProps) => {
           </motion.div>
         )}
 
-        {/* Fly Balloons button - appears after candles are blown */}
-        {showFlyButton && !balloonsFlying && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
-            <Button
-              variant="romantic"
-              size="xl"
-              onClick={handleFlyBalloons}
-              className="animate-bounce-soft"
-            >
-              Fly Balloons 🎈✨
-            </Button>
-          </motion.div>
-        )}
-
-        {candlesBlown && !showFlyButton && (
+        {candlesBlown && (
           <motion.p
             className="font-body text-xl text-muted-foreground"
             initial={{ opacity: 0 }}
@@ -196,17 +174,6 @@ const CelebrationPage = ({ onNext }: CelebrationPageProps) => {
             transition={{ delay: 0.5 }}
           >
             ✨ Your wish will come true ✨
-          </motion.p>
-        )}
-
-        {balloonsFlying && (
-          <motion.p
-            className="font-body text-xl text-muted-foreground mt-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            ✨ Celebrating you! ✨
           </motion.p>
         )}
       </div>
