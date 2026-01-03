@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import Balloons from '@/components/Balloons';
@@ -12,6 +12,7 @@ const CelebrationPage = ({ onNext }: CelebrationPageProps) => {
   const [candlesBlown, setCandlesBlown] = useState(false);
   const [balloonsFlying, setBalloonsFlying] = useState(false);
   const [darkened, setDarkened] = useState(false);
+  const [showFlyButton, setShowFlyButton] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isMuted, setIsMuted] = useState(false);
 
@@ -28,40 +29,42 @@ const CelebrationPage = ({ onNext }: CelebrationPageProps) => {
     // Blow candles animation
     setCandlesBlown(true);
 
-    // Trigger balloons
-    setTimeout(() => setBalloonsFlying(true), 500);
+    // Show fly balloons button after candles blown
+    setTimeout(() => setShowFlyButton(true), 1500);
+  };
+
+  const handleFlyBalloons = () => {
+    // Trigger balloons flying
+    setBalloonsFlying(true);
 
     // Trigger confetti
-    setTimeout(() => {
-      const duration = 4 * 1000;
-      const end = Date.now() + duration;
+    const duration = 4 * 1000;
+    const end = Date.now() + duration;
+    const colors = ['#ff69b4', '#ff1493', '#db7093', '#ffb6c1', '#ffc0cb', '#dda0dd'];
 
-      const colors = ['#ff69b4', '#ff1493', '#db7093', '#ffb6c1', '#ffc0cb', '#dda0dd'];
+    (function frame() {
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: colors
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: colors
+      });
 
-      (function frame() {
-        confetti({
-          particleCount: 3,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 },
-          colors: colors
-        });
-        confetti({
-          particleCount: 3,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 },
-          colors: colors
-        });
-
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      }());
-    }, 800);
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    }());
 
     // Go to next page after celebration
-    setTimeout(onNext, 5000);
+    setTimeout(onNext, 4000);
   };
 
   const toggleMute = () => {
@@ -79,7 +82,7 @@ const CelebrationPage = ({ onNext }: CelebrationPageProps) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Birthday music - using a public domain happy birthday tune URL */}
+      {/* Birthday music */}
       <audio
         ref={audioRef}
         src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
@@ -166,7 +169,24 @@ const CelebrationPage = ({ onNext }: CelebrationPageProps) => {
           </motion.div>
         )}
 
-        {candlesBlown && (
+        {candlesBlown && !balloonsFlying && showFlyButton && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Button
+              variant="romantic"
+              size="xl"
+              onClick={handleFlyBalloons}
+              className="animate-pulse-glow"
+            >
+              Fly Balloons 🎈
+            </Button>
+          </motion.div>
+        )}
+
+        {candlesBlown && balloonsFlying && (
           <motion.p
             className="font-body text-xl text-muted-foreground"
             initial={{ opacity: 0 }}
