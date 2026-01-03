@@ -7,13 +7,11 @@ const FinalMessagePage = () => {
   const [displayedText, setDisplayedText] = useState('');
   const [showHearts, setShowHearts] = useState(false);
 
-  const message = `Happy Birthday ❤️
+  const message = `Dear Madam Jii ❤️
 
-You make my world brighter every single day.
+I just want you to know how much you mean to me. I know I'm not always the best at putting my feelings into words, but that doesn't change how real they are. This is my way of telling you that you matter to me more than I can explain, and I'm really grateful to have you in my life.
 
-I hope this small surprise made you smile 😊🎉
-
-Here's to another year of amazing memories together! 💕`;
+And on your special day, I wish you the happiest birthday 🥹🫶🏻`;
 
   useEffect(() => {
     let index = 0;
@@ -25,7 +23,7 @@ Here's to another year of amazing memories together! 💕`;
         clearInterval(timer);
         setTimeout(() => setShowHearts(true), 500);
       }
-    }, 50);
+    }, 40);
 
     return () => clearInterval(timer);
   }, []);
@@ -63,7 +61,7 @@ Here's to another year of amazing memories together! 💕`;
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
         >
-          <p className="font-display text-2xl md:text-4xl text-foreground whitespace-pre-line leading-relaxed">
+          <p className="font-display text-xl md:text-3xl text-foreground whitespace-pre-line leading-relaxed">
             {displayedText}
             <motion.span
               className="inline-block ml-1"
